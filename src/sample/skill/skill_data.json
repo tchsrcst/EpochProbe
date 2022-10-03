@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Fireball",
+    "base_damage" : 25.0,
+    "crit_chance" : 0.05,
+    "crit_multiplier" : 2.00,
+    "base_speed_per_sec" : 1.467,
+    "ignite_chance" : 0.25,
+    "added_damage_scaling": 1.25,
+    "damage_scaling_per_int_point": 0.04
+  },
+   {
+    "name": "Fireball2",
+    "base_damage" : 25.0,
+    "crit_chance" : 0.05,
+    "crit_multiplier" : 2.00,
+    "base_speed_per_sec" : 1.467,
+    "ignite_chance" : 0.25,
+    "added_damage_scaling": 1.25,
+    "damage_scaling_per_int_point": 0.04
+  },
+   {
+    "name": "Fireball3",
+    "base_damage" : 25.0,
+    "crit_chance" : 0.05,
+    "crit_multiplier" : 2.00,
+    "base_speed_per_sec" : 1.467,
+    "ignite_chance" : 0.25,
+    "added_damage_scaling": 1.25,
+    "damage_scaling_per_int_point": 0.04
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "name": "DamageOverTime",
+    "tier": 1,
+    "_min": 10,
+    "_max": 21
+  },
+  {
+    "name": "FireDamage",
+    "tier": 1,
+    "_min": 10,
+    "_max": 21
+  },
+  {
+    "name": "SpellDamage",
+    "tier": 1,
+    "_min": 10,
+    "_max": 21
+  },
+  {
+    "name": "ElementalDamage",
+    "tier": 1,
+    "_min": 9,
+    "_max": 16
+  },
+  {
+    "name": "ElementalDamageOverTime",
+    "tier": 1,
+    "_min": 18,
+    "_max": 35
+  },
+  {
+    "name": "CriticalStrikeChance",
+    "tier": 1,
+    "_min": 26,
+    "_max": 35
+  },
+  {
+    "name": "SpellCriticalStrikeChance",
+    "tier": 1,
+    "_min": 35,
+    "_max": 44
+  },
+  {
+    "name": "SpellCriticalStrikeMultiplierDamage",
+    "tier": 1,
+    "_min": 12,
+    "_max": 16
+  },
+  {
+    "name": "CastSpeed",
+    "tier": 1,
+    "_min": 7,
+    "_max": 9
+  },
+  {
+    "name": "ChanceToIgniteOnHit",
+    "tier": 1,
+    "_min": 18,
+    "_max": 21
+  }
+]
