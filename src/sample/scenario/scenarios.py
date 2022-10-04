@@ -29,8 +29,10 @@ ShortScenario = Scenario('ShortScenario', 1.0, 10.0, 5.0)
 
 scenarios_dict = {}
 
-relpath = "../scenario/scenario_data.json"
-filepath = Path(__file__).parent / relpath
+data_dir = Path(__file__).parents[3] / 'data'
+filename = "scenario_data.json"
+filepath = data_dir / filename
+print(filepath)
 
 file = open(filepath)
 data = json.load(file)

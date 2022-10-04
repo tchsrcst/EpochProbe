@@ -35,8 +35,10 @@ Fireball = Skill("Fireball", 25.0, 0.05, 2.0, 1.467, 0.25, 1.25, 0.04)
 
 skills_dict = {'TestSkill': TestSkill, 'Fireball': Fireball}
 
-relpath = "../skill/skill_data.json"
-filepath = Path(__file__).parent / relpath
+data_dir = Path(__file__).parents[3] / 'data'
+filename = "skill_data.json"
+filepath = data_dir / filename
+print(filepath)
 
 file = open(filepath)
 data = json.load(file)

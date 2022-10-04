@@ -54,8 +54,10 @@ ChanceToIgniteOnHitT5 = Affix('ChanceToIgniteOnHit', 5, 42, 52)
 
 affixes_dict = {'DamageOverTime': DamageOverTimeT1, 'FireDamage': FireDamageT1}
 
-relpath = "../affix/affix_data.json"
-filepath = Path(__file__).parent / relpath
+data_dir = Path(__file__).parents[3] / 'data'
+filename = "affix_data.json"
+filepath = data_dir / filename
+print(filepath)
 
 file = open(filepath)
 data = json.load(file)

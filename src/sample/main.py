@@ -1,9 +1,10 @@
 import tkinter as tk
-from tkinter import Tk, font
 import tkinter.ttk as ttk
 import sys
 
 from util import save_manager
+from gui import Logger, ScrollableFrame, TableFrame
+from stats import *
 
 import input
 import plot
@@ -12,241 +13,207 @@ from affix import affixes
 from scenario import scenarios
 
 
-class App(Tk):
+class App(tk.Tk):
     skill = skills.Fireball
     scenario = scenarios.BasicScenario
     base = input.InputBase
     input = base
     logger = None
     style = None
-    selected_theme = None
+    version = '0.1'
+    sm = save_manager.SaveManager()
+    content = None
+    text_box = None
 
-    fg_color = "#616975"
-    bg_color = "#2b2b2b"
-    pn_color1 = "#313335"
-    pn_color2 = "#3c3f41"
+    def get_themes(self):
+        return self.style.theme_names()
 
-    font = ()
-
-    bs_array = [
-        (0, "increased Cast Speed", "0.0"),
-        (1, "Increased Damage", "0.0"),
-        (2, "Increased Spell Damage", "0.0"),
-        (3, "Increased Elemental Damage", "0.0"),
-        (4, "Increased Elemental Damage over Time", "0.0"),
-        (5, "Increased Fire Damage", "0.0"),
-        (6, "Increased Damage over Time", "0.0"),
-        (7, "Increased Ignite Chance", "0.0"),
-        (8, "Increased Ignite Duration", "0.0"),
-        (9, "Increased Crit Chance", "0.0"),
-        (10, "Increased Crit Multiplier", "0.0"),
-        (11, "Fire Penetration", "0.0"),
-        (12, "Total More Damage", "0.0")
-    ]
-
-    bs_entry_array = []
-
-    cs_array = [
-        (0, "Total Hit Increased Damage", "0.0"),
-        (1, "Total_Dot_increased Damage", "0.0"),
-        (2, "Regular Hit Damage", "0.0"),
-        (3, "Effective Critical_Strike Chance", "0.0"),
-        (4, "Effective Critical Strike Multiplier", "0.0"),
-        (5, "Effective Critical Strike Modifier", "0.0"),
-        (6, "Critical Hit Damage", "0.0"),
-        (7, "Effective Hit Damage", "0.0"),
-        (8, "Effective Ignite Chance", "0.0"),
-        (9, "Effective Ignite Duration", "0.0"),
-        (10, "Effective Ignite Damage", "0.0"),
-        (11, "Effective Ignite DPS", "0.0"),
-        (12, "Effective Cast Speed", "0.0"),
-        (13, "Effective Hit DPS", "0.0"),
-        (14, "Effective Ignite DPS", "0.0"),
-        (15, "Effective Combined DPS", "0.0")
-    ]
-
-    cs_entry_array = []
-
-    def get_params(self):
-        input.inc_cast_speed = float(self.bs_entry_array[0].get())
-        input.inc_damage = float(self.bs_entry_array[1].get())
-        input.inc_spell_damage = float(self.bs_entry_array[2].get())
-        input.inc_elemental_damage = float(self.bs_entry_array[3].get())
-        input.inc_elemental_dot = float(self.bs_entry_array[4].get())
-        input.inc_fire_damage = float(self.bs_entry_array[5].get())
-        input.inc_dot = float(self.bs_entry_array[6].get())
-        input.inc_ignite_chance = float(self.bs_entry_array[7].get())
-        input.inc_ignite_duration = float(self.bs_entry_array[8].get())
-        input.inc_crit_chance = float(self.bs_entry_array[9].get())
-        input.inc_crit_multiplier = float(self.bs_entry_array[10].get())
-        input.fire_penetration = float(self.bs_entry_array[11].get())
-        input.total_more_damage = float(self.bs_entry_array[12].get())
-        return input
-
-    def change_theme(self):
-        self.style.theme_use(self.selected_theme.get())
+    def set_theme(self, t):
+        self.style.theme_use(t)
 
     def click(self):
-        self.input = self.get_params()
-        plot.main(self.skill, self.input, self.scenario)
+        pass
+
+    def top(self, parent):
+        btn_1 = ttk.Button(master=parent, text="btn1", width=8)
+        btn_1.grid(row=0, column=0, sticky=tk.N)
+        btn_2 = ttk.Button(master=parent, text="btn2", width=8)
+        btn_2.grid(row=0, column=1, sticky=tk.N)
+
+        v_character_slot = tk.StringVar()
+        v_character_slot.set('CharacterSlot')
+        om_character_slot = ttk.OptionMenu(parent, v_character_slot, *self.sm.filenames)
+        om_character_slot.config(width=25)
+        om_character_slot.grid(row=0, column=2, sticky=tk.N)
+
+        v_gui_theme = tk.StringVar()
+        om_gui_theme = ttk.OptionMenu(parent, v_gui_theme, *self.get_themes(), command=self.set_theme)
+        v_gui_theme.set('default')
+        om_gui_theme.config(width=6)
+        om_gui_theme.grid(row=0, column=3, sticky=tk.NE)
+
+    def left(self, parent):
+        options_frame = ttk.Frame(parent)
+        options_frame.pack(padx=4, pady=4)
+
+        scenario_label = ttk.Label(master=options_frame, text="Scenario", width=12, anchor="e", justify=tk.LEFT)
+        scenario_label.grid(row=1, column=0, padx=5)
+        v_scenario = tk.StringVar()
+        om_scenario = ttk.OptionMenu(options_frame, v_scenario, *scenarios.scenarios_dict.keys())
+        om_scenario.config(width=25)
+        om_scenario.grid(row=1, column=1)
+
+        skill_label = ttk.Label(master=options_frame, text="Skill", width=12, anchor="e", justify=tk.LEFT)
+        skill_label.grid(row=2, column=0, padx=5)
+        v_skill = tk.StringVar()
+        om_skill = ttk.OptionMenu(options_frame, v_skill, *skills.skills_dict.keys())
+        om_skill.config(width=25)
+        om_skill.grid(row=2, column=1)
+
+        affix_label = ttk.Label(master=options_frame, text="Affix", width=12, anchor="e", justify=tk.LEFT)
+        affix_label.grid(row=3, column=0, padx=5)
+        v_affix = tk.StringVar()
+        om_affix = ttk.OptionMenu(options_frame, v_affix, *affixes.affixes_dict.keys())
+        om_affix.config(width=25)
+        om_affix.grid(row=3, column=1)
+
+        bs_frame = ttk.Frame(master=parent)
+        bs_frame.pack(fill=tk.X, padx=4, pady=4)
+
+        bs_title = ttk.Label(master=bs_frame, text="Basic Stats (Offence)", anchor="n", justify=tk.CENTER)
+        bs_title.pack(fill=tk.X, side=tk.TOP, pady=2)
+        bs_subframe = ttk.Frame(master=bs_frame)
+        bs_subframe.pack(fill=tk.X, side=tk.TOP, padx=2, pady=2)
+
+        columns = ("param", "value")
+
+        bs_tree = ttk.Treeview(master=bs_subframe, show="", columns=columns, selectmode="none")
+        bs_tree.pack(fill=tk.BOTH)
+        bs_tree.column("#1", minwidth=100, width=200, stretch=tk.YES)
+        bs_tree.column("#2", minwidth=50, width=50, stretch=tk.NO)
+
+        for x in range(5):
+            bs_tree.insert("", tk.END, values=columns)
+
+        btn_frame = ttk.Frame(master=parent)
+        btn_frame.pack(fill=tk.X, expand=True, padx=3, pady=5)
+        btn_recalculate = tk.Button(master=btn_frame, text="Recalculate", command=self.click)
+        btn_recalculate.pack(fill=tk.X, side=tk.LEFT)
+        btn_plot = ttk.Button(master=btn_frame, text="Plot", command=self.click)
+        btn_plot.pack(fill=tk.X, side=tk.LEFT)
+
+    def cs1(self, parent):
+
+        params = {
+            ParamValue(0, "Param1", "Value1"),
+            ParamValue(1, "Param2", "Value2")
+        }
+
+        cs1_frame = TableFrame(master=parent, title="Overview", items=params, borderwidth=2, relief=tk.RIDGE)
+        cs1_frame.pack(fill=tk.X, padx=4, pady=4)
+
+    def cs2(self, parent):
+
+        params = {
+            ParamValue(0, "Param1", "Value1"),
+            ParamValue(1, "Param2", "Value2")
+        }
+
+        cs2_frame = TableFrame(master=parent, title="Hit", items=params, borderwidth=2, relief=tk.RIDGE)
+        cs2_frame.pack(fill=tk.X, padx=4, pady=4)
+
+    def cs3(self, parent):
+
+        params = {
+            ParamValue(0, "Param1", "Value1"),
+            ParamValue(1, "Param2", "Value2")
+        }
+
+        cs3_frame = TableFrame(master=parent, title="Ignite", items=params, borderwidth=2, relief=tk.RIDGE)
+        cs3_frame.pack(fill=tk.X, padx=4, pady=4)
+
+    def cs4(self, parent):
+
+        params = [
+            ParamValue(0, "Param1", "Value1"),
+            ParamValue(1, "Param2", "Value2"),
+            ParamValue(2, "Param3", "Value3")
+        ]
+
+        cs4_frame = TableFrame(master=parent, title="Other", items=params, borderwidth=2, relief=tk.RIDGE)
+        cs4_frame.pack(fill=tk.X, padx=4, pady=4)
+
+    def right(self, parent):
+        cs_left_frame = ttk.Frame(master=parent, borderwidth=2, relief=tk.RIDGE)
+        cs_left_frame.grid(row=0, column=0, sticky=tk.NE)
+        #parent.grid_columnconfigure(0, weight=1)
+        #parent.grid_rowconfigure(0, weight=1)
+
+        self.cs1(cs_left_frame)
+        self.cs2(cs_left_frame)
+        self.cs3(cs_left_frame)
+
+        cs_right_frame = ttk.Frame(master=parent, borderwidth=2, relief=tk.RIDGE)
+        cs_right_frame.grid(row=0, column=1, sticky=tk.NW)
+
+        self.cs4(cs_right_frame)
+
+    def bottom(self, parent):
+        self.text_box = tk.Text(master=parent, state='disabled', height=8,
+                           padx=10, pady=10, borderwidth=5, relief=tk.FLAT)
+        self.text_box.grid(column=0, row=0, sticky=tk.NSEW)
+        ys = ttk.Scrollbar(master=parent, orient='vertical', command=self.text_box.yview())
+        ys.grid(column=1, row=0, sticky=tk.NS)
+        xs = ttk.Scrollbar(master=parent, orient='horizontal', command=self.text_box.xview())
+        xs.grid(column=0, row=1, sticky=tk.EW)
+        parent.grid_columnconfigure(0, weight=1)
+        parent.grid_rowconfigure(0, weight=1)
+        self.text_box['yscrollcommand'] = ys.set
+        self.text_box['xscrollcommand'] = xs.set
 
     def __init__(self):
         super().__init__()
 
-        # 16x9
-        self.geometry("1280x720")
         self.title("Parameters")
+        self.iconbitmap("icon.ico")
+        self.style = ttk.Style()
+        self.set_theme('default')
 
-        self.style = ttk.Style(self)
-        # winnative clam alt default classic vista xpnative
-        self.style.theme_names()
-        self.style.theme_use('clam')
-        current_theme = self.style.theme_use()
+        self.columnconfigure(0, weight=1)
+        #self.rowconfigure(0, weight=1)
+        #self.rowconfigure(1, weight=0)
+        self.rowconfigure(2, weight=1)
 
-        self.font = tk.font.nametofont("TkDefaultFont")
-        self.font.configure(family='JetBrains Mono', size=12, weight=font.NORMAL)
+        top_frame = ttk.Frame(master=self, height=20, relief=tk.RAISED, borderwidth=2)
+        top_frame.grid(row=0, column=0, sticky="new")
+        top_frame.grid_rowconfigure(0, minsize=20)
 
-        # ----- TOP FRAME -----
-        top_frame = tk.Frame(self, background=self.pn_color2)
-        top_frame.pack(side=tk.TOP, fill=tk.X)
+        self.top(top_frame)
 
-        """
-        self.selected_theme = tk.StringVar()
-        theme_frame = ttk.LabelFrame(top_frame, text='Themes')
-        theme_frame.pack()
+        middle_frame = ttk.Frame(master=self, relief=tk.FLAT, borderwidth=2)
+        middle_frame.grid(row=1, column=0, sticky=tk.NSEW)
 
-        for theme_name in self.style.theme_names():
-            rb = ttk.Radiobutton(
-                theme_frame,
-                width=10,
-                text=theme_name,
-                value=theme_name,
-                variable=self.selected_theme,
-                command=self.change_theme)
-            rb.pack(expand=True, fill=tk.X)
-        """
+        left_frame = ttk.Frame(master=middle_frame, relief=tk.GROOVE, borderwidth=2)
+        left_frame.grid(row=0, column=0, sticky=tk.NSEW)
 
-        sm = save_manager.SaveManager()
+        self.left(left_frame)
 
-        save_frame = tk.Frame(master=top_frame)
+        right_frame = ttk.Frame(master=middle_frame, relief=tk.GROOVE, borderwidth=2)
+        right_frame.grid(row=0, column=1, sticky=tk.NSEW)
 
-        # label = tk.Label(master=save_frame, anchor='w', text='CharacterSlot', width=15, height=2)
-        # label.pack(side=tk.LEFT)
-        v_save = tk.StringVar()
-        om_save = tk.OptionMenu(save_frame, v_save, *sm.filenames)
-        v_save.set('CharacterSlot')
-        om_save.config(width=30)
-        om_save.pack(side=tk.LEFT)
-        save_frame.grid(row=0, column=0)
+        scrollable_frame = ScrollableFrame(master=right_frame, relief=tk.GROOVE, borderwidth=15)
+        scrollable_frame.grid(row=0, column=0, sticky=tk.NSEW)
 
-        scenario_frame = tk.Frame(master=top_frame)
-        # label = tk.Label(master=scenario_frame, anchor='w', text='Scenario', width=15, height=2)
-        # label.pack(side=tk.LEFT)
-        v_scenario = tk.StringVar()
-        om_scenario = tk.OptionMenu(scenario_frame, v_scenario, *scenarios.scenarios_dict.keys())
-        v_scenario.set('Scenario')
-        om_scenario.config(width=20)
-        om_scenario.pack(side=tk.LEFT)
-        scenario_frame.grid(row=0, column=1)
+        self.right(scrollable_frame.scrollable_frame)
 
-        skill_frame = tk.Frame(master=top_frame)
-        # label = tk.Label(master=skill_frame, anchor='w', text='Skill', width=15, height=2)
-        # label.pack(side=tk.LEFT)
-        v_skill = tk.StringVar()
-        om_skill = tk.OptionMenu(skill_frame, v_skill, *skills.skills_dict.keys())
-        v_skill.set('Skill')
-        om_skill.config(width=20)
-        om_skill.pack(side=tk.LEFT)
-        skill_frame.grid(row=0, column=2)
+        bottom_frame = ttk.Frame(master=self, relief=tk.SUNKEN, borderwidth=2)
+        bottom_frame.grid(row=2, column=0, sticky=tk.NSEW)
 
-        affix_frame = tk.Frame(master=top_frame)
-        v_affix = tk.StringVar()
-        om_affix = tk.OptionMenu(skill_frame, v_affix, *affixes.affixes_dict.keys())
-        v_skill.set('Skill')
-        om_affix.config(width=20)
-        om_affix.pack(side=tk.LEFT)
-        affix_frame.grid(row=0, column=3)
+        self.bottom(bottom_frame)
 
-        # ----- MIDDLE FRAME -----
-        middle_frame = tk.Frame(self, background=self.pn_color1)
-        middle_frame.pack(fill=tk.BOTH)
-
-        left_frame = tk.Frame(middle_frame, background=self.pn_color1)
-        left_frame.pack(side=tk.LEFT, fill=tk.BOTH)
-
-        right_frame = tk.Frame(middle_frame, background=self.pn_color1)
-        right_frame.pack(side=tk.RIGHT, fill=tk.BOTH)
-
-        title2 = tk.Label(master=left_frame, text="Basic Stats (Offence)")
-        title2.pack(fill=tk.X)
-
-        bs_frame = tk.Frame(master=left_frame)
-        for x in range(len(self.bs_array)):
-            bs_subframe = tk.Frame(master=bs_frame, relief=tk.RAISED, borderwidth=0)
-            bs_entry1_text = tk.StringVar()
-            bs_entry1 = tk.Entry(master=bs_subframe, textvariable=bs_entry1_text, width=30, bg="white")
-            bs_entry1_text.set(self.bs_array[x][1])
-            bs_entry1.pack(side=tk.LEFT)
-            bs_entry2_text = tk.StringVar()
-            bs_entry2 = tk.Entry(master=bs_subframe, textvariable=bs_entry2_text, width=5, bg="white")
-            bs_entry2_text.set(self.bs_array[x][2])
-            bs_entry2.pack(side=tk.LEFT)
-            self.bs_entry_array.append(bs_entry2)
-            bs_subframe.pack()
-        bs_frame.pack()
-
-        btn_frame = tk.Frame(master=left_frame)
-        button1 = tk.Button(master=btn_frame, text="Calculate", command=self.click)
-        button1.pack(fill=tk.X)
-
-        button2 = tk.Button(master=btn_frame, text="Button2", command=self.click)
-        button2.pack(fill=tk.X)
-
-        button3 = tk.Button(master=btn_frame, text="Button3", command=self.click)
-        button3.pack(fill=tk.X)
-
-        btn_frame.pack(fill=tk.X)
-
-        title3 = tk.Label(master=right_frame, text="Calculated Stats (Offence)")
-        title3.pack(fill=tk.X)
-
-        cs_frame = tk.Frame(master=right_frame)
-        for x in range(len(self.cs_array)):
-            cs_subframe = tk.Frame(master=cs_frame, relief=tk.RAISED, borderwidth=0)
-            cs_entry1_text = tk.StringVar()
-            cs_entry1 = tk.Entry(master=cs_subframe, textvariable=cs_entry1_text, width=30, bg="white")
-            cs_entry1_text.set(self.cs_array[x][1])
-            cs_entry1.pack(side=tk.LEFT)
-            cs_entry2_text = tk.StringVar()
-            cs_entry2 = tk.Entry(master=cs_subframe, textvariable=cs_entry2_text, width=5, bg="white")
-            cs_entry2_text.set(self.cs_array[x][2])
-            cs_entry2.pack(side=tk.LEFT)
-            self.cs_entry_array.append(cs_entry2)
-            cs_subframe.pack()
-        cs_frame.pack()
-
-        # ----- BOTTOM FRAME -----
-        bottom_frame = tk.Frame(master=self, background=self.pn_color1)
-        text_box = tk.Text(master=bottom_frame, state='disabled', width=120, height=10,
-                           foreground=self.fg_color, background=self.bg_color,
-                           padx=10, pady=10, borderwidth=5, relief=tk.FLAT)
-        ys = tk.Scrollbar(master=bottom_frame, orient='vertical', command=text_box.yview())
-        xs = tk.Scrollbar(master=bottom_frame, orient='horizontal', command=text_box.xview())
-        text_box['yscrollcommand'] = ys.set
-        text_box['xscrollcommand'] = xs.set
-        text_box.grid(column=0, row=0, sticky='nwes')
-        xs.grid(column=0, row=1, sticky='we')
-        ys.grid(column=1, row=0, sticky='ns')
-        bottom_frame.grid_columnconfigure(0, weight=1)
-        bottom_frame.grid_rowconfigure(0, weight=1)
-        bottom_frame.pack(fill=tk.X)
-
-        self.logger = Logger(text_box)
+        self.logger = Logger(self.text_box)
         sys.stdout = self.logger
-
-        self.logger.writeln("available tkinter themes: " + self.style.theme_names().__str__())
-        self.logger.writeln("current tkinter theme: " + current_theme)
-
+        self.logger.writeln("Welcome to EpochProbe v." + self.version.__str__() + "!")
 
 
 if __name__ == "__main__":

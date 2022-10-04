@@ -1,7 +1,4 @@
-# Techsorcist's LastEpoch Tools
- Repo with my LastEpoch tools
- 
-## LastEpochDamageCalculator
+# EpochProbe
 
 Tools for visualizing affixes impact on damage per second for some LastEpoch skills:
 
