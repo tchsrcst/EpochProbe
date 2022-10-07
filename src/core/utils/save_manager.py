@@ -83,8 +83,14 @@ class SaveManager:
     def __init__(self):
         self.home = str(Path.home())
         self.path = os.path.join(self.home, SaveManager.REL_PATH)
+        self.saves = []
+
+        if not os.path.exists(self.path):
+            print("[SaveManager] Local saves directory not found.")
+            return
+
         print("[SaveManager] Local saves path: " + self.path)
-        print("[SaveManager] Scanning...")
+        print("[SaveManager] Scanning for saves...")
         filenames = os.listdir(self.path)
 
         slot_names = []
@@ -92,10 +98,13 @@ class SaveManager:
             if re.match(SaveManager.SLOT_PATTERN, filename):
                 slot_names.append(filename)
 
+        if len(slot_names) == 0:
+            print("[SaveManager] Local saves not found.")
+            return
+
         print("[SaveManager] Found: " + slot_names.__str__())
 
         i = 0
-        self.saves = []
 
         print("[SaveManager] Characters: ")
         for filename in slot_names:
@@ -111,7 +120,6 @@ class SaveManager:
             print("{}: {}".format(i, save))
             self.saves.append(save)
             i += 1
-
 
     @staticmethod
     def load(filepath):
@@ -136,8 +144,11 @@ class SaveManager:
         return items
 
 
+save_to_load = 0
+
 if __name__ == "__main__":
     sm = SaveManager()
-    s = sm.saves[4]
-    SaveManager.equipped_items(s)
+    if len(sm.saves) != 0:
+        s = sm.saves[save_to_load]
+        sm.equipped_items(s)
 
