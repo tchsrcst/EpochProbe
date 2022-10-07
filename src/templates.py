@@ -1,30 +1,33 @@
 import tkinter as tk
 from tkinter import ttk
 
-
 class ScrollableFrame(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
-        canvas = tk.Canvas(self)
-        y_scrollbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
-        x_scrollbar = ttk.Scrollbar(self, orient="horizontal", command=canvas.xview)
-        self.scrollable_frame = ttk.Frame(canvas)
+        sb_x = ttk.Scrollbar(master=self, orient="horizontal")
+        sb_y = ttk.Scrollbar(master=self, orient="vertical")
+        canvas = tk.Canvas(master=self, width=400, height=400, scrollregion=(0, 0, 500, 500))
+        canvas.configure(yscrollcommand=sb_y.set)
+        canvas.configure(xscrollcommand=sb_x.set)
+        sb_x['command'] = canvas.xview
+        sb_y['command'] = canvas.yview
 
-        self.scrollable_frame.bind(
+        canvas.grid(row=0, column=0, sticky=tk.N)
+        sb_x.grid(row=1, column=0, sticky=tk.EW)
+        sb_y.grid(row=0, column=1, sticky=tk.NS)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+
+        self.sub_frame = ttk.Frame(master=canvas)
+        self.sub_frame.bind(
             "<Configure>",
             lambda e: canvas.configure(
                 scrollregion=canvas.bbox("all")
             )
         )
 
-        canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
-        self.scrollable_frame.grid(row=0, column=0, sticky=tk.NSEW)
-
-        canvas.configure(yscrollcommand=y_scrollbar.set)
-        canvas.configure(xscrollcommand=x_scrollbar.set)
-        canvas.grid(row=0, column=0, sticky=tk.NSEW)
-        y_scrollbar.grid(row=0, column=1, sticky=tk.NS)
-        x_scrollbar.grid(row=1, column=0, sticky=tk.EW)
+        canvas.create_window((0, 0), window=self.sub_frame, anchor="nw")
+        self.sub_frame.grid(row=0, column=0, sticky=tk.N)
 
 
 class CollapsableFrame(ttk.Frame):
@@ -62,7 +65,7 @@ class TableFrame(CollapsableFrame):
         cs1_tree.column("#2", minwidth=50, width=50, stretch=tk.NO)
         cs1_tree.config(height=5)
         for item in items:
-            cs1_tree.insert("", tk.END, values=item., tags=item.__str__)
+            cs1_tree.insert("", tk.END, values=item, tags=item.__str__)
 
 
 class Logger:

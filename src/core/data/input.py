@@ -1,4 +1,4 @@
-from affix import affixes as af
+from src.core.data import affixes as af
 
 
 class Input:

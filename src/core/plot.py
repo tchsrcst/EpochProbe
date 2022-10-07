@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-import calculator
-import input
+from src.core.utils import calculator
+from src.core.data import input
 
 
 def plot_calc(_axs, calc, color):
